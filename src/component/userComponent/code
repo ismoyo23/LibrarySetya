@@ -1,0 +1,205 @@
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Platform,
+  Image,
+  ScrollView,
+  Button,
+} from 'react-native';
+import {useLinkTo, useNavigation} from '@react-navigation/native';
+import {booksGet} from '../../redux/actions/books';
+import {connect} from 'react-redux';
+import {BASE_URL} from '@env';
+import {SearchBar} from 'react-native-elements';
+let BodyComponent = (props) => {
+  let navigation = useNavigation();
+  useEffect(() => {
+    getBooks();
+  }, []);
+
+  let [search, setSearch] = useState('');
+
+  let getBooks = () => {
+    let data = {
+      ConUrl: `${BASE_URL}`,
+      SearchBooks: '',
+    };
+    props.booksGet(data);
+  };
+  return (
+    <ScrollView>
+      <SearchBar
+        value={search}
+        onChangeText={(value) => setSearch(value)}
+        lightTheme
+        placeholder="Type Here..."
+        icon={{type: 'font-awesome', name: 'search'}}
+        onSubmitEditing={() =>
+          navigation.navigate('Search', {title: `${search}`})
+        }
+      />
+      <View style={styles.Container}>
+        <View style={styles.Row}>
+          <Text style={styles.TextHeader}>Populer Books</Text>
+          <Text style={styles.TextSeeAll}>See All</Text>
+        </View>
+
+        <ScrollView horizontal style={styles.Row}>
+          {props.dataBooks.data.map((books) => {
+            return (
+              <View style={styles.CardImage}>
+                <Image
+                  style={styles.ImageSlide}
+                  source={{uri: `${BASE_URL}${books.image}`}}
+                />
+                <View style={styles.button}>
+                  <Button
+                    title="Go to Details"
+                    onPress={() => {
+                      this.props.navigation.navigate('Details', {
+                        itemId: 86,
+                        otherParam: 'anything you want here',
+                      });
+                    }}
+                  />
+                </View>
+              </View>
+            );
+          })}
+        </ScrollView>
+
+        <View style={styles.ListBooks}>
+          <Text style={styles.TitleList}>List Book</Text>
+          {props.dataBooks.data.map((books) => {
+            return (
+              <View style={styles.Bottom}>
+                <View style={styles.CardList}>
+                  <View style={styles.headerList}>
+                    <Image
+                      style={styles.ImgList}
+                      source={{uri: `${BASE_URL}${books.image}`}}
+                    />
+                  </View>
+                  <View style={styles.ListData}>
+                    <Text style={styles.TitleOnCard}>{books.title}</Text>
+                    <Text style={styles.DisOnCard}>
+                      W3Schools is optimized for learning, testing, and
+                      training. Examples
+                    </Text>
+                    <View style={styles.buttonDetail}>
+                      <Button
+                        onPress={() =>
+                          navigation.navigate('Detail', {id: `${books.id}`})
+                        }
+                        title="Detail"
+                      />
+                    </View>
+                  </View>
+                </View>
+              </View>
+            );
+          })}
+        </View>
+      </View>
+    </ScrollView>
+  );
+};
+
+const mapStateToProps = (state) => ({
+  dataBooks: state.booksGet,
+});
+const mapDispatchToProp = {booksGet};
+
+export default connect(mapStateToProps, mapDispatchToProp)(BodyComponent);
+
+let styles = StyleSheet.create({
+  TextHeader: {
+    fontSize: 20,
+    marginLeft: 10,
+    marginTop: 12,
+    fontFamily:
+      Platform.os === 'android' ? 'Red Rose cursive' : 'something.ttf',
+  },
+  TextSeeAll: {
+    fontSize: 18,
+    color: '#00cc00',
+    marginLeft: 'auto',
+    marginTop: 11,
+  },
+  ImageSlide: {
+    marginTop: 12,
+    marginLeft: 19,
+    borderRadius: 9,
+    height: 140,
+    width: 80,
+  },
+  TextTitle: {
+    marginLeft: 8,
+    fontSize: 18,
+    marginTop: 1,
+    textAlign: 'center',
+  },
+  CardImage: {
+    width: 130,
+  },
+  Container: {
+    marginLeft: 10,
+    marginRight: 10,
+  },
+  Row: {
+    flexDirection: 'row',
+  },
+  button: {
+    width: 90,
+    marginLeft: 17,
+    marginTop: 10,
+  },
+
+  ListBooks: {
+    marginTop: 15,
+    marginLeft: 10,
+    marginBottom: 40,
+  },
+  TitleList: {
+    fontSize: 20,
+  },
+  CardList: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.8,
+    shadowRadius: 20,
+    elevation: 1,
+    marginTop: 13,
+  },
+
+  ImgList: {
+    borderRadius: 12,
+    height: 140,
+    width: 80,
+  },
+  headerList: {
+    marginTop: 16,
+    marginLeft: 12,
+    marginBottom: 16,
+  },
+  buttonDetail: {
+    width: 120,
+  },
+  ListData: {
+    position: 'absolute',
+    marginLeft: 130,
+    marginTop: 20,
+  },
+  TitleOnCard: {
+    fontSize: 17,
+  },
+  DisOnCard: {
+    fontSize: 15,
+    color: '#b8b894',
+    marginBottom: 12,
+  },
+});
