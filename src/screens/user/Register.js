@@ -1,93 +1,172 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   TextInput,
   View,
   StyleSheet,
   Image,
   Text,
+  TouchableOpacity,
+  ImageBackground,
   ScrollView,
 } from 'react-native';
-import {Button} from 'react-native-elements';
-import Logo from '../../main/img/undraw_online_1qud.png';
-import styles from '../../styles/register';
-import {register} from '../../redux/actions/auth';
+
 import {connect} from 'react-redux';
+import {login} from '../../redux/actions/auth';
 import {BASE_URL} from '@env';
-import {Link} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 let Register = (props) => {
+  let navigation = useNavigation();
   let [username, setUsername] = useState('');
   let [password, setPassword] = useState('');
-  let [email, setEmail] = useState('');
-  let [address, setAddress] = useState('');
-  let [role] = useState('1');
-  let setRegister = () => {
+  let [typingUsername, setTpypingUsername] = useState(false);
+  let [typingPassword, setTpypingPassoword] = useState(false);
+
+  let openDrawer = () => {
+    props.navigation.openDrawer();
+  };
+
+  let Login = () => {
     let data = {
+      url: BASE_URL,
       username: username,
       password: password,
-      email: email,
-      address: address,
-      role: role,
-      url: BASE_URL,
     };
-    props.register(data).then(() => {
+    props.login(data).then(() => {
       navigation.navigate('Home');
     });
   };
+
   return (
-    <>
-      <Image style={styles.logo} source={Logo} />
-      <ScrollView style={styles.Body}>
-        <View style={styles.card}>
-          <Text style={styles.textLogin}>Sign Up</Text>
-          <Text style={styles.textWarning}>
-            Please enter your credential processtes
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <ImageBackground
+          imageStyle={{
+            borderBottomRightRadius: 100,
+            borderBottomLeftRadius: 100,
+          }}
+          source={require('../../main/img/images.jpeg')}
+          style={styles.ImageBackground}>
+          <Icon
+            onPress={openDrawer}
+            name="bars"
+            size={22}
+            color="#fff"
+            style={{position: 'absolute', top: 30, left: 20}}
+          />
+          <Text
+            style={{
+              color: 'white',
+              fontWeight: 'bold',
+              fontSize: 29,
+              marginTop: -200,
+            }}>
+            Welcome To SetyaLibrary
           </Text>
-          <TextInput
-            value={username}
-            onChangeText={(value) => setUsername(value)}
-            style={styles.inputClass}
-            placeholder="username"
-          />
-          <TextInput
-            value={email}
-            onChangeText={(value) => setEmail(value)}
-            style={styles.inputClass}
-            placeholder="Email"
-          />
-          <TextInput
-            value={password}
-            onChangeText={(value) => setPassword(value)}
-            type="password"
-            style={styles.inputClass}
-            placeholder="password"
-            secureTextEntry={true}
-          />
-          <TextInput
-            value={address}
-            onChangeText={(value) => setAddress(value)}
-            style={styles.inputClass}
-            placeholder="Adreess"
-          />
-          <View style={styles.buttonClick}>
-            <View style={styles.buttonClick}>
-              <Button onPress={setRegister} title="Sign Up" />
+          <Text style={{color: 'white'}}>Sign Up to Continue</Text>
+        </ImageBackground>
+      </View>
+      <View style={styles.footer}>
+        <Text style={styles.title}>Username</Text>
+        <View style={styles.action}>
+          <TextInput placeholder="Input Username" style={styles.TextInput} />
+        </View>
+
+        <Text style={styles.title}>Email</Text>
+        <View style={styles.action}>
+          <TextInput placeholder="Input Email" style={styles.TextInput} />
+        </View>
+
+        <Text style={styles.title}>Passsword</Text>
+        <View style={styles.action}>
+          <TextInput placeholder="Input Password" style={styles.TextInput} />
+        </View>
+
+        <Text style={styles.title}>Address</Text>
+        <View style={styles.action}>
+          <TextInput placeholder="Input Addres" style={styles.TextInput} />
+        </View>
+        <TouchableOpacity>
+          <View style={styles.buttonContainer}>
+            <ImageBackground
+              style={styles.button}
+              imageStyle={{
+                borderBottomRightRadius: 100,
+                borderBottomLeftRadius: 100,
+                borderTopLeftRadius: 100,
+                borderTopRightRadius: 100,
+              }}
+              source={require('../../main/img/images.jpeg')}>
+              <Text
+                style={{
+                  color: 'white',
+                  textAlign: 'center',
+                  fontSize: 20,
+                  marginTop: 4,
+                }}>
+                Sign Up
+              </Text>
+            </ImageBackground>
+            <View style={{flexDirection: 'row', marginTop: 20}}>
+              <Text style={{fontWeight: 'bold'}}>Already account? </Text>
+              <Text style={{fontWeight: 'bold', color: 'aqua'}}>Sign In</Text>
             </View>
           </View>
-          <View style={styles.bodyFooter}>
-            <Text style={styles.textFooter1}>have Account?</Text>
-            <Link style={styles.textFooter2} to="/Login">
-              Sign In
-            </Link>
-          </View>
-        </View>
-      </ScrollView>
-    </>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 };
 
 const mapStateToProps = (state) => ({
-  resRegister: register,
+  resLogin: state.auth,
 });
-const mapDispatchToProp = {register};
+const mapDispatchToProp = {login};
 
 export default connect(mapStateToProps, mapDispatchToProp)(Register);
+
+let styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+  },
+  header: {
+    flex: 1,
+  },
+  footer: {
+    flex: 1,
+    padding: 24,
+    marginTop: -200,
+  },
+  ImageBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 200,
+  },
+  title: {
+    color: 'black',
+    fontWeight: 'bold',
+  },
+  action: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f2f2f2',
+  },
+  TextInput: {
+    flex: 1,
+    marginTop: 5,
+    paddingBottom: 5,
+    color: 'grey',
+  },
+  buttonContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  button: {
+    width: '97%',
+    height: 40,
+    marginTop: 30,
+  },
+});

@@ -1,18 +1,11 @@
 import React from 'react';
 import {View, StyleSheet} from 'react-native';
-import {
-  Avatar,
-  Title,
-  Caption,
-  Paragraph,
-  Drawer,
-  Text,
-  TouchableRipple,
-  Switch,
-} from 'react-native-paper';
+import {Avatar, Title, Caption, Paragraph, Drawer} from 'react-native-paper';
 import {DrawerContentScrollView, DrawerItem} from '@react-navigation/drawer';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import {useLinkTo} from '@react-navigation/native';
 let DrawerContent = (props) => {
+  const linkTo = useLinkTo();
   return (
     <View style={{flex: 1}}>
       <DrawerContentScrollView {...props}>
@@ -50,24 +43,24 @@ let DrawerContent = (props) => {
           <Drawer.Section style={styles.drawerSection}>
             <DrawerItem
               icon={({color, size}) => {
-                <Icon name="account-outline" color={color} size={size} />;
+                return <Icon name="home" size={24} color="#c2c2a3" />;
               }}
               label="Home"
-              onPress={() => {}}
+              onPress={() => props.navigation.navigate('SetyaLibrary')}
             />
             <DrawerItem
               icon={({color, size}) => {
-                <Icon name="account-outline" color={color} size={size} />;
+                return <Icon name="sign-in" size={24} color="#c2c2a3" />;
               }}
               label="Login"
-              onPress={() => {}}
+              onPress={() => props.navigation.navigate('Login')}
             />
             <DrawerItem
               icon={({color, size}) => {
-                <Icon name="account-outline" color={color} size={size} />;
+                return <Icon name="user-plus" size={24} color="#c2c2a3" />;
               }}
               label="Register"
-              onPress={() => {}}
+              onPress={() => props.navigation.navigate('Register')}
             />
           </Drawer.Section>
         </View>
@@ -75,7 +68,7 @@ let DrawerContent = (props) => {
       <Drawer.Section style={styles.bottomDrawerSection}>
         <DrawerItem
           icon={({color, size}) => {
-            <Icon name="home-outline" color={color} size={size} />;
+            return <Icon name="sign-out" size={24} color="#c2c2a3" />;
           }}
           label="LogOut"
           onPress={() => {}}

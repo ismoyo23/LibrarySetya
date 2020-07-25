@@ -2,8 +2,6 @@ import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
 const Tab = createBottomTabNavigator();
-import topNavigation from './topNavigation';
-import BooksComponent from '../component/userComponent/BodyComponent';
 import DetailComponent from '../component/userComponent/DetailComponent';
 import CategoryComponent from '../component/userComponent/HistoryComponent';
 import SearchComponent from '../component/userComponent/SearchComponent';

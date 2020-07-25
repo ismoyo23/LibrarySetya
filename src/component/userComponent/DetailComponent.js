@@ -1,166 +1,255 @@
 import React, {useState, useEffect} from 'react';
-import {StyleSheet, View, Image, Text, ScrollView, Button} from 'react-native';
-import ButtonMin from './chilComponent/ButtonMin';
-import ButtonPlus from './chilComponent/ButtonPlus';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  ImageBackground,
+  ScrollView,
+  TouchableOpacity,
+  FlatList,
+} from 'react-native';
 import {connect} from 'react-redux';
 import {booksGet} from '../../redux/actions/books';
 import {borrowed} from '../../redux/actions/borrow';
 import {login} from '../../redux/actions/auth';
 import {BASE_URL} from '@env';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import {useNavigation} from '@react-navigation/native';
+import axios from 'axios';
+let Status = (props) => {
+  if (props.stok < 1) {
+    return (
+      <Text style={{color: 'white', fontWeight: 'bold'}}>UnAvailable</Text>
+    );
+  } else {
+    return <Text style={{color: 'white', fontWeight: 'bold'}}>Available</Text>;
+  }
+};
+
 let DetailComponent = (props) => {
+  let navigation = useNavigation();
+  let [getIdBooks, setGetIdBooks] = useState([]);
+  let goBack = () => {
+    navigation.navigate('SetyaLibrary');
+  };
+
   useEffect(() => {
+    getId();
     getBooks();
   }, []);
 
-  let [stok, setStok] = useState(0);
+  let getId = () => {
+    let data = {
+      ConUrl: BASE_URL,
+      SearchBooks: `?search=${props.route.params.id}&field=id`,
+    };
 
-  let borrowBooks = () => {
-    if (props.resLogin.data.id_user == undefined) {
-      alert('You must Login');
-    } else {
-      let data = {
-        idUser: props.resLogin.data.id_user,
-        idBooks: props.route.params.id,
-        stok: stok,
-        ConUrl: BASE_URL,
-      };
-      props.borrowed(data).then(() => {
-        alert('Success');
-      });
-    }
+    axios({
+      method: 'GET',
+      url: `${data.ConUrl}books/${data.SearchBooks}`,
+    }).then((response) => {
+      setGetIdBooks(response.data.data[0]);
+    });
   };
 
   let getBooks = () => {
     let data = {
       ConUrl: BASE_URL,
-      SearchBooks: `?search=${props.route.params.id}&field=id`,
+      SearchBooks: ``,
     };
     props.booksGet(data);
   };
-
   return (
-    <ScrollView>
-      <Image
-        style={styles.imgHeader}
-        source={{uri: `${BASE_URL}${props.BooksbyId.data[0].image}`}}
-      />
-      <View style={styles.header}>
+    <View style={{backgroundColor: 'white', flex: 1}}>
+      <ImageBackground
+        source={{uri: `${BASE_URL}${getIdBooks.image}`}}
+        style={styles.image}
+        imageStyle={{
+          borderBottomLeftRadius: 10,
+          borderBottomRightRadius: 10,
+        }}>
+        <Text style={styles.Tagline}>{getIdBooks.name_author}</Text>
+        <Text style={styles.Booksname}>{getIdBooks.title}</Text>
+
+        <TouchableOpacity
+          onPress={goBack}
+          style={{
+            position: 'absolute',
+            padding: 10,
+            left: 20,
+            top: 20,
+            backgroundColor: '#ff6200',
+            paddingHorizontal: 10,
+            borderRadius: 40,
+          }}>
+          <Icon name="arrow-left" size={24} color="#fff" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={{
+            position: 'absolute',
+            padding: 10,
+            right: 20,
+            top: 30,
+            backgroundColor: '#ff6200',
+            paddingHorizontal: 10,
+            borderRadius: 40,
+          }}>
+          <Status status={getIdBooks.stok} />
+        </TouchableOpacity>
+      </ImageBackground>
+      <TouchableOpacity style={styles.BooksBtn}>
+        <Text style={styles.booksStok}>Stok {getIdBooks.stok}</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.BorrowButton}>
+        <Text style={styles.booksStok}>Borrow</Text>
+      </TouchableOpacity>
+
+      <ScrollView style={{backgroundColor: 'white'}}>
+        <Text style={{padding: 14, fontSize: 20, fontWeight: 'bold'}}>
+          Discription
+        </Text>
+
+        <Text
+          style={{
+            paddingHorizontal: 14,
+            fontSize: 14,
+            fontWeight: 'nornal',
+            opacity: 0.3,
+            justifyContent: 'flex-start',
+            textAlign: 'justify',
+            lineHeight: 26,
+          }}>
+          {getIdBooks.discription}
+        </Text>
         <View>
-          <Text style={styles.Title}>{props.BooksbyId.data[0].title}</Text>
-          <Text style={styles.TitleAuthor}>
-            {props.BooksbyId.data[0].name_author}
+          <Text style={{padding: 14, fontSize: 20, fontWeight: 'bold'}}>
+            Books Other
           </Text>
+          <ScrollView horizontal>
+            {props.dataBooks.data.map((books) => {
+              return (
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate('Detail', {
+                      id: `${books.id}`,
+                    })
+                  }>
+                  <View>
+                    <Image
+                      source={{uri: `${BASE_URL}${books.image}`}}
+                      style={{
+                        width: 150,
+                        height: 150,
+                        marginHorizontal: 10,
+                        borderRadius: 10,
+                      }}
+                    />
+                    <Icon
+                      name="book"
+                      size={16}
+                      color="white"
+                      style={{
+                        marginHorizontal: 14,
+                        marginTop: 4,
+                        position: 'absolute',
+                        left: 10,
+                        bottom: 10,
+                      }}
+                    />
+                    <Text
+                      style={{
+                        marginHorizontal: 14,
+                        marginTop: 4,
+                        position: 'absolute',
+                        left: 30,
+                        bottom: 10,
+                        color: 'white',
+                        fontSize: 14,
+                      }}>
+                      {books.title}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
         </View>
-        <View style={styles.headerStok}>
-          <View style={styles.stokCount}>
-            <Text style={styles.textStok}>{props.BooksbyId.data[0].stok}</Text>
-          </View>
-        </View>
-      </View>
-
-      <Text style={styles.discription}>
-        {props.BooksbyId.data[0].discription}
-      </Text>
-      <View style={styles.bodyFooter}>
-        <View style={styles.customButton}>
-          <ButtonMin press={() => setStok(stok - 1)} stok={stok} />
-          <View style={styles.qyt}>
-            <Text style={styles.qytStok}>{stok}</Text>
-          </View>
-          <ButtonPlus
-            stok={stok}
-            stokDB={props.BooksbyId.data[0].stok}
-            press={() => setStok(stok + 1)}
-            title="+"
-          />
-        </View>
-
-        <View style={styles.bodyBorrow}>
-          <Button onPress={borrowBooks} title="Borrow" />
-        </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
 const mapStateToProps = (state) => ({
   resLogin: state.auth,
-  BooksbyId: state.booksGet,
+  dataBooks: state.booksGet,
 });
-const mapDispatchToProp = {login, booksGet, borrowed};
+const mapDispatchToProp = {login, borrowed, booksGet};
 
 export default connect(mapStateToProps, mapDispatchToProp)(DetailComponent);
 
 let styles = StyleSheet.create({
-  imgHeader: {
-    width: '100%',
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  image: {
     height: 300,
-  },
-  Title: {
-    fontWeight: 'bold',
-    fontSize: 30,
-    marginTop: 12,
-  },
-  TitleAuthor: {
-    fontSize: 18,
-    color: '#adad85',
-  },
-  discription: {
-    color: '#adad85',
-    marginTop: 12,
-  },
-  titleStok: {
-    fontWeight: 'bold',
-    marginTop: 19,
-    fontSize: 19,
+    justifyContent: 'flex-end',
   },
 
-  bodyStok: {
-    flexDirection: 'row',
-  },
-  header: {
-    flexDirection: 'row',
-  },
-  headerStok: {
-    marginLeft: 'auto',
-    marginTop: 12,
-  },
-  bodyFooter: {
-    flexDirection: 'row',
-  },
-  customButton: {
-    width: 90,
-    flexDirection: 'row',
-    marginTop: 19,
-  },
-  bodyBorrow: {
-    marginLeft: 'auto',
-    marginTop: 16,
-  },
-  myButton: {
-    marginLeft: 12,
-  },
-  qyt: {
-    backgroundColor: 'aqua',
-    width: 30,
-    marginLeft: 4,
-    marginRight: 4,
-  },
-  qytStok: {
+  Tagline: {
     color: 'white',
-    textAlign: 'center',
-    fontSize: 20,
-    marginTop: 2,
+    fontSize: 16,
+    fontWeight: 'bold',
+    paddingHorizontal: 14,
+    marginVertical: 6,
   },
-  stokCount: {
-    backgroundColor: '#009999',
-    width: 100,
-    height: 30,
-    borderRadius: 4,
-  },
-  textStok: {
+
+  Booksname: {
     color: 'white',
-    textAlign: 'center',
-    marginTop: 4,
+    fontSize: 24,
+    fontWeight: 'bold',
+    paddingHorizontal: 14,
+    marginBottom: 30,
+  },
+  BooksBtn: {
+    position: 'absolute',
+    right: 12,
+    top: 280,
+    backgroundColor: '#ff6200',
+    padding: 16,
+    borderRadius: 40,
+    elevation: 5,
+  },
+  booksStok: {
+    color: 'white',
+    fontSize: 14,
+  },
+  darkOverlay: {
+    width: 150,
+    height: 150,
+    position: 'absolute',
+    backgroundColor: '#000',
+    opacity: 0.1,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 10,
+    marginHorizontal: 10,
+  },
+  BorrowButton: {
+    position: 'absolute',
+    right: 12,
+    top: '90%',
+    backgroundColor: '#ff6200',
+    padding: 16,
+    borderRadius: 40,
+    elevation: 5,
   },
 });
