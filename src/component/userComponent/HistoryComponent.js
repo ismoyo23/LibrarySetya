@@ -7,18 +7,23 @@ import {
   Image,
   ScrollView,
   Button,
+  ImageBackground,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
 import {borrowGet} from '../../redux/actions/borrow';
 import {connect} from 'react-redux';
 import {BASE_URL} from '@env';
 import {login} from '../../redux/actions/auth';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import {ListItem} from 'react-native-elements';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 let HistoryComponent = (props) => {
-  let navigation = useNavigation();
-
   useEffect(() => {
     getBorrow();
   }, []);
+
+  let openDrawer = () => {
+    props.navigation.openDrawer();
+  };
   let getBorrow = () => {
     let data = {
       ConUrl: BASE_URL,
@@ -28,41 +33,104 @@ let HistoryComponent = (props) => {
     props.borrowGet(data);
   };
   return (
-    <ScrollView>
-      <View style={styles.Container}>
-        <View style={styles.ListBooks}>
-          <Text style={styles.TitleList}>History</Text>
-          <View style={styles.Bottom}>
-            {props.dataBorrow.data.map((books) => {
-              return (
-                <View style={styles.CardList}>
-                  <View style={styles.headerList}>
-                    <Image
-                      style={styles.ImgList}
-                      source={{uri: `${BASE_URL}${books.image}`}}
-                    />
-                  </View>
-                  <View style={styles.ListData}>
-                    <Text style={styles.TitleOnCard}>{books.title}</Text>
-                    <Text style={styles.DisOnCard}>
-                      {books.discription.substring(0, 90)}
-                    </Text>
-                    <View style={styles.buttonDetail}>
-                      <Button
-                        onPress={() =>
-                          navigation.navigate('Detail', {id: `${books.id}`})
-                        }
-                        title="Detail"
-                      />
-                    </View>
-                  </View>
+    <View style={styles.container}>
+      <ImageBackground
+        imageStyle={{
+          borderBottomRightRadius: 100,
+          borderBottomLeftRadius: 100,
+        }}
+        source={require('../../main/img/images.jpeg')}
+        style={styles.ImageBackground}>
+        <Icon
+          onPress={openDrawer}
+          name="bars"
+          size={22}
+          color="#fff"
+          style={{position: 'absolute', top: 30, left: 20}}
+        />
+        <Text
+          style={{
+            color: 'white',
+            fontWeight: 'bold',
+            fontSize: 29,
+            marginTop: -300,
+          }}>
+          Hallo {props.resLogin.data.name_user}
+        </Text>
+        <Text style={{color: 'white'}}>Welcome back to SetyaLibrary</Text>
+        <Image
+          style={{
+            marginTop: 13,
+            borderRadius: 100,
+            height: 100,
+            width: 100,
+          }}
+          source={require('../../main/img/avatar.png')}
+        />
+      </ImageBackground>
+
+      <View
+        style={{
+          top: 250,
+          flexDirection: 'row',
+          borderWidth: 1,
+          borderRadius: 2,
+          borderColor: '#ddd',
+          borderBottomWidth: 0,
+          shadowColor: '#000',
+          shadowOffset: {width: 0, height: 2},
+          shadowOpacity: 0.8,
+          shadowRadius: 2,
+          elevation: 1,
+          marginLeft: 5,
+          marginRight: 5,
+          position: 'absolute',
+          height: 300,
+        }}>
+        <ScrollView style={{width: '100%', marginTop: 12}}>
+          {props.dataBorrow.data.map((books) => {
+            return (
+              <View style={{flexDirection: 'row', marginTop: 12}}>
+                <Image
+                  style={{width: 80, height: 80}}
+                  source={require('../../main/img/avatar.png')}
+                />
+                <View style={{marginLeft: 10}}>
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      fontWeight: 'bold',
+                      marginTop: 13,
+                    }}>
+                    {books.title.substr(0, 10)}
+                  </Text>
+                  <Text>{books.date}</Text>
                 </View>
-              );
-            })}
-          </View>
-        </View>
+                <TouchableOpacity style={{marginLeft: '43%', marginTop: 21}}>
+                  <View
+                    style={{
+                      backgroundColor: 'red',
+                      height: 40,
+                      width: 80,
+                      borderRadius: 23,
+                    }}>
+                    <Text
+                      style={{
+                        textAlign: 'center',
+                        color: 'white',
+                        fontWeight: 'bold',
+                        marginTop: 8,
+                      }}>
+                      Cancel
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            );
+          })}
+        </ScrollView>
       </View>
-    </ScrollView>
+    </View>
   );
 };
 
@@ -75,89 +143,15 @@ const mapDispatchToProp = {borrowGet, login};
 export default connect(mapStateToProps, mapDispatchToProp)(HistoryComponent);
 
 let styles = StyleSheet.create({
-  TextHeader: {
-    fontSize: 20,
-    marginLeft: 10,
-    marginTop: 12,
-    fontFamily:
-      Platform.os === 'android' ? 'Red Rose cursive' : 'something.ttf',
-  },
-  TextSeeAll: {
-    fontSize: 18,
-    color: '#00cc00',
-    marginLeft: 'auto',
-    marginTop: 11,
-  },
-  ImageSlide: {
-    marginTop: 12,
-    marginLeft: 8,
-    borderRadius: 9,
-  },
-  TextTitle: {
-    marginLeft: 8,
-    fontSize: 18,
-    marginTop: 1,
-    textAlign: 'center',
-  },
-  CardImage: {
-    width: 130,
-  },
-  Container: {
-    marginLeft: 10,
-    marginRight: 10,
-  },
-  Row: {
-    flexDirection: 'row',
-  },
-  button: {
-    width: 90,
-    marginLeft: 17,
-    marginTop: 10,
-  },
-
-  ListBooks: {
-    marginTop: 15,
-    marginLeft: 10,
-    marginBottom: 40,
-  },
-  TitleList: {
-    fontSize: 20,
-  },
-  CardList: {
+  container: {
+    flex: 1,
     backgroundColor: 'white',
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.8,
-    shadowRadius: 20,
-    elevation: 1,
-    marginTop: 13,
+    justifyContent: 'center',
   },
-
-  ImgList: {
-    borderRadius: 12,
-    height: 140,
-    width: 80,
-  },
-  headerList: {
-    marginTop: 16,
-    marginLeft: 12,
-    marginBottom: 16,
-  },
-  buttonDetail: {
-    width: 120,
-  },
-  ListData: {
-    position: 'absolute',
-    marginLeft: 130,
-    marginTop: 20,
-  },
-  TitleOnCard: {
-    fontSize: 17,
-  },
-  DisOnCard: {
-    fontSize: 15,
-    color: '#b8b894',
-    marginBottom: 12,
+  ImageBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 200,
   },
 });

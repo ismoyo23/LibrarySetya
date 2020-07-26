@@ -53,7 +53,7 @@ let BodyComponent = (props) => {
           <View>
             <TextInput
               style={styles.searchBox}
-              placeholder="Search destination"
+              placeholder="Search Books"
               placeholderTextColor="#666"></TextInput>
 
             <Icon
@@ -174,6 +174,38 @@ let BodyComponent = (props) => {
             </Text>
           </View>
         </View>
+        <View>
+          <View style={{paddingVertical: 20, paddingLeft: 16}}>
+            <Text style={{fontWeight: 'bold', fontSize: 20, marginBottom: 12}}>
+              List Books
+            </Text>
+            <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+              {props.dataBooks.data.map((books) => {
+                return (
+                  <TouchableOpacity
+                    onPress={() =>
+                      navigation.navigate('Detail', {id: `${books.id}`})
+                    }>
+                    <Image
+                      style={{
+                        width: 180,
+                        marginRight: 14,
+                        height: 250,
+                        borderRadius: 10,
+                        marginRight: 8,
+                        marginBottom: 10,
+                      }}
+                      source={{uri: `${BASE_URL}${books.image}`}}
+                    />
+
+                    <View style={styles.imageOvarlayList}></View>
+                    <Text style={styles.imageText}>{books.title}</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+        </View>
       </ScrollView>
     </View>
   );
@@ -232,7 +264,16 @@ let styles = StyleSheet.create({
     borderRadius: 10,
     position: 'absolute',
     backgroundColor: '#000',
-    opacity: 0.2,
+    opacity: 0.5,
+  },
+  imageOvarlayList: {
+    width: 180,
+    height: 250,
+    marginRight: 8,
+    borderRadius: 10,
+    position: 'absolute',
+    backgroundColor: '#000',
+    opacity: 0.5,
   },
   imageText: {
     position: 'absolute',

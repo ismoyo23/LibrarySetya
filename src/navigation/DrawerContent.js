@@ -30,13 +30,7 @@ let DrawerContent = (props) => {
                 <Paragraph style={(styles.paragraph, styles.caption)}>
                   90
                 </Paragraph>
-                <Caption style={styles.caption}>Following</Caption>
-              </View>
-              <View style={styles.section}>
-                <Paragraph style={(styles.paragraph, styles.caption)}>
-                  90
-                </Paragraph>
-                <Caption style={styles.caption}>Follower</Caption>
+                <Caption style={styles.caption}> borrowed books</Caption>
               </View>
             </View>
           </View>

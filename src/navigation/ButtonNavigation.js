@@ -1,15 +1,15 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
-const Tab = createBottomTabNavigator();
 import DetailComponent from '../component/userComponent/DetailComponent';
 import CategoryComponent from '../component/userComponent/HistoryComponent';
 import SearchComponent from '../component/userComponent/SearchComponent';
 import {createStackNavigator} from '@react-navigation/stack';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import BodyComponent from '../component/userComponent/BodyComponent';
+import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 const Stack = createStackNavigator();
-
+const Tab = createMaterialBottomTabNavigator();
 function Nesting() {
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
@@ -22,7 +22,10 @@ function Nesting() {
 
 let ButtonNavigation = () => {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+      activeColor="#0080ff"
+      inactiveColor="#999966"
+      barStyle={{backgroundColor: 'white'}}>
       <Tab.Screen
         name="Home"
         component={Nesting}

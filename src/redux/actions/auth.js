@@ -18,7 +18,7 @@ export let register = (data) => ({
     method: 'POST',
     url: `${data.url}books/register`,
     data: {
-      name: data.username,
+      name_user: data.username,
       password: data.password,
       email: data.email,
       address: data.address,

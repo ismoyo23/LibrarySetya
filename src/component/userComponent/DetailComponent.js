@@ -7,7 +7,7 @@ import {
   ImageBackground,
   ScrollView,
   TouchableOpacity,
-  FlatList,
+  Alert,
 } from 'react-native';
 import {connect} from 'react-redux';
 import {booksGet} from '../../redux/actions/books';
@@ -17,6 +17,7 @@ import {BASE_URL} from '@env';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
+import Spinner from 'react-native-loading-spinner-overlay';
 let Status = (props) => {
   if (props.stok < 1) {
     return (
@@ -28,8 +29,12 @@ let Status = (props) => {
 };
 
 let DetailComponent = (props) => {
+  console.log(props.resLogin.id_user);
+
+  console.log(props.resLogin);
   let navigation = useNavigation();
   let [getIdBooks, setGetIdBooks] = useState([]);
+  let [isLoading, setIsLoading] = useState(false);
   let goBack = () => {
     navigation.navigate('SetyaLibrary');
   };
@@ -59,6 +64,38 @@ let DetailComponent = (props) => {
       SearchBooks: ``,
     };
     props.booksGet(data);
+  };
+
+  let ActionBorrow = () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      if (props.resLogin.data.id_user != null) {
+        let data = {
+          ConUrl: BASE_URL,
+          idBooks: getIdBooks.id,
+          stok: 1,
+          idUser: props.resLogin.data.id_user,
+          date: Date(),
+        };
+
+        props.borrowed(data).then(() => {
+          Alert.alert(
+            'Success',
+            'Borrowed book Success',
+            [{text: 'OK', onPress: () => navigation.navigate('History')}],
+            {cancelable: false},
+          );
+        });
+      } else {
+        Alert.alert(
+          'Failed',
+          'You must Login',
+          [{text: 'OK', onPress: () => navigation.navigate('Login')}],
+          {cancelable: false},
+        );
+      }
+    }, 1000);
   };
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
@@ -103,7 +140,7 @@ let DetailComponent = (props) => {
         <Text style={styles.booksStok}>Stok {getIdBooks.stok}</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.BorrowButton}>
+      <TouchableOpacity style={styles.BorrowButton} onPress={ActionBorrow}>
         <Text style={styles.booksStok}>Borrow</Text>
       </TouchableOpacity>
 
@@ -178,6 +215,7 @@ let DetailComponent = (props) => {
           </ScrollView>
         </View>
       </ScrollView>
+      <Spinner visible={isLoading} />
     </View>
   );
 };
@@ -250,6 +288,6 @@ let styles = StyleSheet.create({
     backgroundColor: '#ff6200',
     padding: 16,
     borderRadius: 40,
-    elevation: 5,
+    zIndex: 1,
   },
 });
