@@ -1,173 +1,210 @@
-import React, {useEffect, useState} from 'react';
-import {DataTable} from 'react-native-paper';
+import React, {useState, useEffect} from 'react';
+import {
+  ImageBackground,
+  View,
+  Text,
+  Image,
+  ScrollView,
+  Alert,
+} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import {connect} from 'react-redux';
 import {booksGet} from '../../redux/actions/books';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import {BASE_URL} from '@env';
-import {
-  ScrollView,
-  Button,
-  Alert,
-  Modal,
-  StyleSheet,
-  Text,
-  TouchableHighlight,
-  View,
-  TextInput,
-} from 'react-native';
-import FormData from 'form-data';
+import {deleteBooks} from '../../redux/actions/books';
 let BooksComponent = (props) => {
-  const [modalVisible, setModalVisible] = useState(false);
+  let navigation = useNavigation();
   useEffect(() => {
     getBooks();
   }, []);
+
   let getBooks = () => {
     let data = {
       ConUrl: BASE_URL,
-      SearchBooks: '',
+      sort: '',
+      genre: '',
     };
     props.booksGet(data);
   };
-  let actionBooks = () => {};
+  let openDrawer = () => {
+    props.navigation.openDrawer();
+  };
+
+  let deleteData = (id) => {
+    Alert.alert(
+      'Really?',
+      'Will you delete this book data?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: () => {
+            let data = {
+              ConUrl: BASE_URL,
+              id: id,
+            };
+            props.deleteBooks(data).then(() => {
+              Alert.alert(
+                'Success',
+                'Delete Books success',
+                [{text: 'OK', onPress: () => getBooks()}],
+                {cancelable: false},
+              );
+            });
+          },
+        },
+      ],
+      {cancelable: false},
+    );
+  };
   return (
-    <>
-      <View style={styles.centeredView}>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            Alert.alert('Modal has been closed.');
-          }}>
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <Text style={styles.modalText}>Add Books</Text>
-              <TextInput
-                style={{
-                  height: 40,
-                  borderColor: 'gray',
-                  borderWidth: 1,
-                  borderRadius: 20,
-                }}
-                placeholder="add Title"
-                onChangeText={(text) => onChangeText(text)}
-              />
-              <TextInput
-                style={{
-                  height: 40,
-                  borderColor: 'gray',
-                  borderWidth: 1,
-                  borderRadius: 20,
-                }}
-                placeholder="add Title"
-                onChangeText={(text) => onChangeText(text)}
-              />
-              <TextInput
-                style={{
-                  height: 40,
-                  borderColor: 'gray',
-                  borderWidth: 1,
-                  borderRadius: 20,
-                }}
-                placeholder="add Title"
-                onChangeText={(text) => onChangeText(text)}
-              />
-              <TouchableHighlight
-                style={{...styles.openButton, backgroundColor: '#2196F3'}}
-                onPress={() => {
-                  setModalVisible(!modalVisible);
-                }}>
-                <Text style={styles.textStyle}>Add Books</Text>
-              </TouchableHighlight>
-            </View>
-          </View>
-        </Modal>
+    <View>
+      <ImageBackground
+        style={{width: '100%', height: 200}}
+        imageStyle={{
+          borderBottomRightRadius: 100,
+          borderBottomLeftRadius: 100,
+        }}
+        source={require('../../main/img/images.jpeg')}>
+        <TouchableOpacity
+          style={{left: 20, top: 23}}
+          onPress={() => openDrawer()}>
+          <Icon name="bars" style={{color: 'white', fontSize: 23}} />
+        </TouchableOpacity>
 
-        <TouchableHighlight
-          style={styles.openButton}
-          onPress={() => {
-            setModalVisible(true);
+        <Text
+          style={{
+            textAlign: 'center',
+            fontSize: 30,
+            color: 'white',
+            fontWeight: 'bold',
+            top: 60,
           }}>
-          <Text style={styles.textStyle}>Add Data</Text>
-        </TouchableHighlight>
+          Welcome to Setya Library
+        </Text>
+        <Text
+          style={{
+            color: 'white',
+            fontWeight: 'bold',
+            fontSize: 20,
+            textAlign: 'center',
+            top: 70,
+          }}>
+          M Ismoyo Setyonowidagdo
+        </Text>
+      </ImageBackground>
+      <View style={{top: 20, marginLeft: 20, marginRight: 20}}>
+        <View
+          style={{
+            borderColor: 'white',
+            height: 400,
+            shadowOpacity: 0.3,
+            shadowRadius: 3,
+            shadowOffset: {
+              height: 0,
+              width: 0,
+            },
+            //android
+            elevation: 1,
+            borderRadius: 30,
+          }}>
+          <ScrollView
+            style={{
+              height: 900,
+            }}>
+            {props.dataBooks.data.map((books) => {
+              return (
+                <View
+                  style={{
+                    height: 100,
+                    top: 30,
+                    left: 17,
+                    flexDirection: 'row',
+                  }}>
+                  <Image
+                    style={{width: 60, height: 60, borderRadius: 90}}
+                    source={{uri: `${BASE_URL}${books.image}`}}
+                  />
+                  <View style={{width: 160}}>
+                    <Text style={{fontWeight: 'bold', left: 11, fontSize: 20}}>
+                      {books.title}
+                    </Text>
+                    <Text style={{fontSize: 17, left: 12}}>
+                      {books.name_genre}
+                    </Text>
+                  </View>
+                  <View>
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: 'aqua',
+
+                        width: 60,
+                        height: 40,
+                        borderRadius: 100,
+                      }}>
+                      <Icon
+                        style={{textAlign: 'center', top: 7}}
+                        name="pencil-square-o"
+                        size={25}
+                        color="white"
+                      />
+                    </TouchableOpacity>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => deleteData(books.id)}
+                    style={{
+                      backgroundColor: 'red',
+                      marginLeft: 4,
+                      width: 60,
+                      height: 40,
+                      borderRadius: 100,
+                      zIndex: 1,
+                    }}>
+                    <Icon
+                      style={{textAlign: 'center', top: 6}}
+                      name="trash-o"
+                      size={25}
+                      color="white"
+                    />
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
+          </ScrollView>
+        </View>
       </View>
-      <ScrollView>
-        <DataTable>
-          <DataTable.Header>
-            <DataTable.Title>Title</DataTable.Title>
-            <DataTable.Title numeric>Author</DataTable.Title>
-            <DataTable.Title numeric>Genre</DataTable.Title>
-            <DataTable.Title numeric>Action</DataTable.Title>
-          </DataTable.Header>
-
-          {props.dataBooks.data.map((books) => {
-            return (
-              <DataTable.Row>
-                <DataTable.Cell>{books.title}</DataTable.Cell>
-                <DataTable.Cell numeric>{books.name_author}</DataTable.Cell>
-                <DataTable.Cell numeric>{books.name_genre}</DataTable.Cell>
-                <DataTable.Cell numeric>
-                  <Button title="update"></Button>
-                </DataTable.Cell>
-              </DataTable.Row>
-            );
-          })}
-
-          <DataTable.Pagination
-            page={1}
-            numberOfPages={3}
-            onPageChange={(page) => {
-              console.log(page);
-            }}
-            label="1-2 of 6"
-          />
-        </DataTable>
-      </ScrollView>
-    </>
+      <TouchableOpacity
+        onPress={() => navigation.navigate('Action')}
+        style={{
+          alignContent: 'center',
+          alignItems: 'center',
+        }}>
+        <View
+          style={{
+            backgroundColor: '#009999',
+            width: 50,
+            height: 50,
+            borderRadius: 200,
+            zIndex: 1,
+          }}>
+          <Icon
+            style={{textAlign: 'center', top: 15}}
+            name="plus"
+            color="white"
+            size={20}></Icon>
+        </View>
+      </TouchableOpacity>
+    </View>
   );
 };
-
 const mapStateToProps = (state) => ({
   dataBooks: state.booksGet,
 });
-const mapDispatchToProp = {booksGet};
+const mapDispatchToProp = {booksGet, deleteBooks};
 
 export default connect(mapStateToProps, mapDispatchToProp)(BooksComponent);
-
-const styles = StyleSheet.create({
-  centeredView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 22,
-  },
-  modalView: {
-    width: '70%',
-    margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  openButton: {
-    backgroundColor: '#F194FF',
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2,
-  },
-  textStyle: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-});

@@ -28,10 +28,31 @@ let Status = (props) => {
   }
 };
 
-let DetailComponent = (props) => {
-  console.log(props.resLogin.id_user);
+let ButtonBorrow = (props) => {
+  if (props.tblBorrow == props.tblUser) {
+    if (props.status === 'borrow') {
+      return (
+        <TouchableOpacity style={styles.BorrowButton} onPress={props.borrow}>
+          <Text style={styles.booksStok}>Cancel</Text>
+        </TouchableOpacity>
+      );
+    } else {
+      return (
+        <TouchableOpacity style={styles.BorrowButton} onPress={props.borrow}>
+          <Text style={styles.booksStok}>Borrow</Text>
+        </TouchableOpacity>
+      );
+    }
+  } else {
+    return (
+      <TouchableOpacity style={styles.BorrowButton} onPress={props.borrow}>
+        <Text style={styles.booksStok}>Borrow</Text>
+      </TouchableOpacity>
+    );
+  }
+};
 
-  console.log(props.resLogin);
+let DetailComponent = (props) => {
   let navigation = useNavigation();
   let [getIdBooks, setGetIdBooks] = useState([]);
   let [isLoading, setIsLoading] = useState(false);
@@ -39,10 +60,14 @@ let DetailComponent = (props) => {
     navigation.navigate('SetyaLibrary');
   };
 
-  useEffect(() => {
-    getId();
-    getBooks();
-  }, []);
+  React.useEffect(() => {
+    const reloadPage = navigation.addListener('focus', () => {
+      getId();
+      getBooks();
+    });
+
+    return reloadPage;
+  }, [navigation]);
 
   let getId = () => {
     let data = {
@@ -76,14 +101,14 @@ let DetailComponent = (props) => {
           idBooks: getIdBooks.id,
           stok: 1,
           idUser: props.resLogin.data.id_user,
-          date: Date(),
+          status: 'borrow',
         };
 
         props.borrowed(data).then(() => {
           Alert.alert(
             'Success',
             'Borrowed book Success',
-            [{text: 'OK', onPress: () => navigation.navigate('History')}],
+            [{text: 'OK', onPress: () => navigation.navigate('Borrower')}],
             {cancelable: false},
           );
         });
@@ -140,9 +165,12 @@ let DetailComponent = (props) => {
         <Text style={styles.booksStok}>Stok {getIdBooks.stok}</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.BorrowButton} onPress={ActionBorrow}>
-        <Text style={styles.booksStok}>Borrow</Text>
-      </TouchableOpacity>
+      <ButtonBorrow
+        status={props.dataBooks.data.status}
+        tblBorrow={props.dataBooks.data.id_user}
+        tblUser={props.resLogin.data.id_user}
+        borrow={ActionBorrow}
+      />
 
       <ScrollView style={{backgroundColor: 'white'}}>
         <Text style={{padding: 14, fontSize: 20, fontWeight: 'bold'}}>

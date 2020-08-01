@@ -1,19 +1,19 @@
-import axios from "axios";
+import axios from 'axios';
 
 // ==============================================
 // action get data Author
 export let booksGet = (data) => ({
-  type: "BOOKS_GET",
+  type: 'BOOKS_GET',
   payload: axios({
-    method: "GET",
-    url: `${data.ConUrl}books/${data.SearchBooks}`,
+    method: 'GET',
+    url: `${data.ConUrl}books/${data.sort}${data.genre}`,
   }),
 });
 
 // ==============================================
 // action Add data Author
 export let addData = (data, form) => ({
-  type: "PROCESS_BOOKS",
+  type: 'PROCESS_BOOKS',
   payload: axios({
     method: data.Method,
     url: data.ConUrl,
@@ -24,9 +24,9 @@ export let addData = (data, form) => ({
 // ===============================================
 // action delete data author
 export let deleteBooks = (data) => ({
-  type: "DELETE_BOOKS",
+  type: 'DELETE_BOOKS',
   payload: axios({
-    method: "DELETE",
+    method: 'DELETE',
     url: `${data.ConUrl}books/${data.id}`,
   }),
 });
@@ -34,9 +34,9 @@ export let deleteBooks = (data) => ({
 /// ===============================================
 // action show data books by id
 export let showBooks = (data) => ({
-  type: "SHOW_BOOKS",
+  type: 'SHOW_BOOKS',
   payload: axios({
-    method: "GET",
+    method: 'GET',
     url: `${data.ConUrl}books/?search=${data.id}&field=id`,
   }),
 });

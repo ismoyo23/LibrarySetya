@@ -1,163 +1,209 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
-  View,
-  Text,
   StyleSheet,
-  Platform,
+  Text,
+  View,
   Image,
+  ImageBackground,
   ScrollView,
-  Button,
+  TouchableOpacity,
+  FlatList,
+  TextInput,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import {booksGet} from '../../redux/actions/books';
 import {connect} from 'react-redux';
 import {BASE_URL} from '@env';
-import {login} from '../../redux/actions/auth';
-let SearchComponent = (props) => {
-  let navigation = useNavigation();
+import Icon from 'react-native-vector-icons/FontAwesome';
+import image from '../../../src/main/img/Minuman-Pengganti-Kopi.jpg';
+import Spinner from 'react-native-loading-spinner-overlay';
+let BodyComponent = (props) => {
+  React.useEffect(() => {
+    const reloadPage = navigation.addListener('focus', () => {
+      getsBooks();
+    });
+    return reloadPage;
+  }, [navigation]);
 
-  useEffect(() => {
-    getBooks();
-  }, []);
-  let getBooks = () => {
+  let navigation = useNavigation();
+  let [search, setSearch] = useState('');
+  let [isLoading, setIsLoading] = useState(false);
+
+  let getsBooks = () => {
     let data = {
-      ConUrl: BASE_URL,
+      ConUrl: `${BASE_URL}`,
       SearchBooks: `?search=${props.route.params.title}&field=title`,
     };
-
     props.booksGet(data);
   };
+
+  let searchSubmit = () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      navigation.navigate('Search', {
+        title: search,
+      });
+    }, 1000);
+  };
+
+  let goBack = () => {
+    navigation.navigate('SetyaLibrary');
+  };
   return (
-    <ScrollView>
-      <View style={styles.Container}>
-        <View style={styles.ListBooks}>
-          <Text style={styles.TitleList}>Search</Text>
-          <View style={styles.Bottom}>
-            {props.dataBooks.data.map((books) => {
-              return (
-                <View style={styles.CardList}>
-                  <View style={styles.headerList}>
+    <View style={{marginBottom: 300}}>
+      <Spinner visible={isLoading} />
+      <View>
+        <ImageBackground
+          source={image}
+          style={{width: '100%', height: 270}}
+          imageStyle={{borderBottomRightRadius: 40}}>
+          <View style={styles.DarkOverlay}></View>
+          <View style={styles.searchContainer}>
+            <Text style={styles.userGreet}>Setya Library,</Text>
+            <Text style={styles.userText}>What book do you want to find?</Text>
+          </View>
+          <View>
+            <TextInput
+              onChangeText={(text) => setSearch(text)}
+              value={search}
+              onSubmitEditing={searchSubmit}
+              style={styles.searchBox}
+              placeholder="Search Books"
+              placeholderTextColor="#666"></TextInput>
+
+            <Icon
+              name="search"
+              size={22}
+              color="#666"
+              style={{position: 'absolute', top: 30, right: 60, opacity: 0.6}}
+            />
+          </View>
+          <Icon
+            onPress={goBack}
+            name="arrow-left"
+            size={22}
+            color="#fff"
+            style={{position: 'absolute', top: 30, left: 16}}
+          />
+          <Icon
+            name="bell"
+            size={22}
+            color="#fff"
+            style={{position: 'absolute', top: 30, right: 16, opacity: 0.6}}
+          />
+        </ImageBackground>
+      </View>
+
+      <ScrollView>
+        <View>
+          <View style={{paddingVertical: 20, paddingLeft: 16}}>
+            <Text style={{fontWeight: 'bold', fontSize: 20, marginBottom: 12}}>
+              Search
+            </Text>
+            <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+              {props.dataBooks.data.map((books) => {
+                return (
+                  <TouchableOpacity
+                    onPress={() =>
+                      navigation.navigate('Detail', {id: `${books.id}`})
+                    }>
                     <Image
-                      style={styles.ImgList}
+                      style={{
+                        width: 180,
+                        marginRight: 14,
+                        height: 250,
+                        borderRadius: 10,
+                        marginRight: 8,
+                        marginBottom: 10,
+                      }}
                       source={{uri: `${BASE_URL}${books.image}`}}
                     />
-                  </View>
-                  <View style={styles.ListData}>
-                    <Text style={styles.TitleOnCard}>{books.title}</Text>
-                    <Text style={styles.DisOnCard}>
-                      {books.discription.substring(0, 90)}
-                    </Text>
-                    <View style={styles.buttonDetail}>
-                      <Button
-                        onPress={() =>
-                          navigation.navigate('Detail', {id: `${books.id}`})
-                        }
-                        title="Detail"
-                      />
-                    </View>
-                  </View>
-                </View>
-              );
-            })}
+
+                    <View style={styles.imageOvarlayList}></View>
+                    <Text style={styles.imageText}>{books.title}</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
           </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
 const mapStateToProps = (state) => ({
   dataBooks: state.booksGet,
-  resLogin: state.auth,
 });
-const mapDispatchToProp = {booksGet, login};
+const mapDispatchToProp = {booksGet};
 
-export default connect(mapStateToProps, mapDispatchToProp)(SearchComponent);
+export default connect(mapStateToProps, mapDispatchToProp)(BodyComponent);
 
 let styles = StyleSheet.create({
-  TextHeader: {
-    fontSize: 20,
-    marginLeft: 10,
-    marginTop: 12,
-    fontFamily:
-      Platform.os === 'android' ? 'Red Rose cursive' : 'something.ttf',
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
   },
-  TextSeeAll: {
-    fontSize: 18,
-    color: '#00cc00',
-    marginLeft: 'auto',
-    marginTop: 11,
-  },
-  ImageSlide: {
-    marginTop: 12,
-    marginLeft: 8,
-    borderRadius: 9,
-  },
-  TextTitle: {
-    marginLeft: 8,
-    fontSize: 18,
-    marginTop: 1,
-    textAlign: 'center',
-  },
-  CardImage: {
-    width: 130,
-  },
-  Container: {
-    marginLeft: 10,
-    marginRight: 10,
-  },
-  Row: {
-    flexDirection: 'row',
-  },
-  button: {
-    width: 90,
-    marginLeft: 17,
-    marginTop: 10,
-  },
-
-  ListBooks: {
-    marginTop: 15,
-    marginLeft: 10,
-    marginBottom: 40,
-  },
-  TitleList: {
-    fontSize: 20,
-  },
-  CardList: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.8,
-    shadowRadius: 20,
-    elevation: 1,
-    marginTop: 13,
-  },
-
-  ImgList: {
-    borderRadius: 12,
-    height: 140,
-    width: 80,
-  },
-  headerList: {
-    marginTop: 16,
-    marginLeft: 12,
-    marginBottom: 16,
-  },
-  buttonDetail: {
-    width: 120,
-  },
-  ListData: {
+  DarkOverlay: {
     position: 'absolute',
-    marginLeft: 130,
-    marginTop: 20,
+    top: 0,
+    right: 0,
+    left: 0,
+    height: 270,
+    backgroundColor: '#000',
+    opacity: 0.2,
+    borderBottomRightRadius: 65,
   },
-  TitleOnCard: {
-    fontSize: 17,
+  searchContainer: {
+    paddingTop: 100,
+    padding: 16,
   },
-  DisOnCard: {
-    fontSize: 15,
-    color: '#b8b894',
-    marginBottom: 12,
+  userGreet: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  userText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  searchBox: {
+    marginTop: 16,
+    backgroundColor: '#fff',
+    paddingLeft: 24,
+    padding: 12,
+    borderTopRightRadius: 40,
+    borderBottomRightRadius: 40,
+    width: '90%',
+  },
+  imageOvarlay: {
+    width: 150,
+    height: 250,
+    marginRight: 8,
+    borderRadius: 10,
+    position: 'absolute',
+    backgroundColor: '#000',
+    opacity: 0.5,
+  },
+  imageOvarlayList: {
+    width: 180,
+    height: 250,
+    marginRight: 8,
+    borderRadius: 10,
+    position: 'absolute',
+    backgroundColor: '#000',
+    opacity: 0.5,
+  },
+  imageText: {
+    position: 'absolute',
+    color: 'white',
+    marginTop: 4,
+    left: 10,
+    fontSize: 14,
+    left: 30,
+    bottom: 10,
   },
 });

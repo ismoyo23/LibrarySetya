@@ -9,6 +9,8 @@ import LogoutComponent from '../component/userComponent/LogoutComponent';
 import {login} from '../redux/actions/auth';
 import {connect} from 'react-redux';
 import DrawerContent from './DrawerContent';
+import AdminDrawer from './AdminDrawer';
+import BooksStackNavigation from './BooksStackNavigation';
 let Drawer = createDrawerNavigator();
 let Navigation = (props) => {
   if (props.auth.data.role == 0 || props.auth.data.role == undefined) {
@@ -21,8 +23,8 @@ let Navigation = (props) => {
     );
   } else {
     return (
-      <Drawer.Navigator>
-        <Drawer.Screen name="Books" component={Books} />
+      <Drawer.Navigator drawerContent={(props) => <AdminDrawer {...props} />}>
+        <Drawer.Screen name="Books" component={BooksStackNavigation} />
         <Drawer.Screen name="Genre" component={ButtonNavigation} />
         <Drawer.Screen name="Author" component={ButtonNavigation} />
         <Drawer.Screen name="Logout" component={LogoutComponent} />

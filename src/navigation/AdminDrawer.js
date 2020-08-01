@@ -5,8 +5,8 @@ import {DrawerContentScrollView, DrawerItem} from '@react-navigation/drawer';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {connect} from 'react-redux';
 import {logout} from '../redux/actions/auth';
-
-let DrawerContent = (props) => {
+import {login} from '../redux/actions/auth';
+let AdminDrawer = (props) => {
   console.log(props);
   let Logout = () => {
     Alert.alert(
@@ -40,9 +40,13 @@ let DrawerContent = (props) => {
                 }}
                 size={50}
               />
-              <View style={{marginLeft: 15, flexDirection: 'column'}}>
-                <Title style={styles.title}>M Ismoyo</Title>
-                <Caption style={styles.caption}>User</Caption>
+
+              <View
+                style={{marginLeft: 15, flexDirection: 'column', width: 150}}>
+                <Title style={styles.title}>
+                  {props.resLogin.data.name_user}
+                </Title>
+                <Caption style={styles.caption}>Admin</Caption>
               </View>
             </View>
 
@@ -61,7 +65,7 @@ let DrawerContent = (props) => {
                 return <Icon name="home" size={24} color="#c2c2a3" />;
               }}
               label="Home"
-              onPress={() => props.navigation.navigate('SetyaLibrary')}
+              onPress={() => props.navigation.navigate('Books')}
             />
             <DrawerItem
               icon={({color, size}) => {
@@ -95,10 +99,11 @@ let DrawerContent = (props) => {
 
 const mapStateToProps = (state) => ({
   Logout: state.logout,
+  resLogin: state.auth,
 });
-const mapDispatchToProp = {logout};
+const mapDispatchToProp = {logout, login};
 
-export default connect(mapStateToProps, mapDispatchToProp)(DrawerContent);
+export default connect(mapStateToProps, mapDispatchToProp)(AdminDrawer);
 
 let styles = StyleSheet.create({
   drawerContent: {

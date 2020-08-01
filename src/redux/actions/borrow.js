@@ -25,6 +25,7 @@ export let borrowed = (data) => ({
       id_books: data.idBooks,
       count: data.stok,
       id_user: data.idUser,
+      status: data.status,
     },
   }),
 });

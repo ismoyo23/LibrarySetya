@@ -6,20 +6,28 @@ import {
   Platform,
   Image,
   ScrollView,
-  Button,
   ImageBackground,
+  Alert,
 } from 'react-native';
 import {borrowGet} from '../../redux/actions/borrow';
+import {borrowAction} from '../../redux/actions/borrow';
 import {connect} from 'react-redux';
 import {BASE_URL} from '@env';
 import {login} from '../../redux/actions/auth';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {ListItem} from 'react-native-elements';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import {useNavigation} from '@react-navigation/native';
+import Moment from 'moment';
 let HistoryComponent = (props) => {
-  useEffect(() => {
-    getBorrow();
-  }, []);
+  let navigation = useNavigation();
+  Moment.locale('en');
+  React.useEffect(() => {
+    const reloadPage = navigation.addListener('focus', () => {
+      getBorrow();
+    });
+
+    return reloadPage;
+  }, [navigation]);
 
   let openDrawer = () => {
     props.navigation.openDrawer();
@@ -32,6 +40,39 @@ let HistoryComponent = (props) => {
 
     props.borrowGet(data);
   };
+
+  let cancelBorrow = (value) => {
+    Alert.alert(
+      'Warning',
+      'Do you will cancel borrow books?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: () => {
+            let data = {
+              ConUrl: BASE_URL,
+              id: value,
+            };
+            props.borrowAction(data).then(() => {
+              Alert.alert('Success', 'Cancel Success', [
+                {
+                  text: 'OK',
+                  onPress: () => navigation.navigate('SetyaLibrary'),
+                },
+              ]);
+            });
+          },
+        },
+      ],
+      {cancelable: false},
+    );
+  };
+
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -92,8 +133,16 @@ let HistoryComponent = (props) => {
             return (
               <View style={{flexDirection: 'row', marginTop: 12}}>
                 <Image
-                  style={{width: 80, height: 80}}
-                  source={require('../../main/img/avatar.png')}
+                  style={{
+                    marginLeft: 9,
+                    width: 80,
+                    height: 80,
+                    borderTopLeftRadius: 10,
+                    borderTopRightRadius: 10,
+                    borderBottomRightRadius: 10,
+                    borderBottomLeftRadius: 10,
+                  }}
+                  source={{uri: `${BASE_URL}${books.image}`}}
                 />
                 <View style={{marginLeft: 10}}>
                   <Text
@@ -102,11 +151,13 @@ let HistoryComponent = (props) => {
                       fontWeight: 'bold',
                       marginTop: 13,
                     }}>
-                    {books.title.substr(0, 10)}
+                    {books.title.substr(0, 5)}...
                   </Text>
-                  <Text>{books.date}</Text>
+                  <Text>{Moment(books.create_at).format('D MMM YYYY')}</Text>
                 </View>
-                <TouchableOpacity style={{marginLeft: '43%', marginTop: 21}}>
+                <TouchableOpacity
+                  onPress={() => cancelBorrow(books.id_borrower)}
+                  style={{marginLeft: '49%', marginTop: 21}}>
                   <View
                     style={{
                       backgroundColor: 'red',
@@ -138,7 +189,7 @@ const mapStateToProps = (state) => ({
   dataBorrow: state.borrowGet,
   resLogin: state.auth,
 });
-const mapDispatchToProp = {borrowGet, login};
+const mapDispatchToProp = {borrowGet, login, borrowAction};
 
 export default connect(mapStateToProps, mapDispatchToProp)(HistoryComponent);
 
