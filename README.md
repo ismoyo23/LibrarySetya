@@ -8,7 +8,7 @@
 
 
 # Dependencies
-"@fortawesome/fontawesome-svg-core": "^1.2.30",
+
     "@fortawesome/free-solid-svg-icons": "^5.14.0",
     "@fortawesome/react-native-fontawesome": "^0.2.5",
     "@react-native-community/async-storage": "^1.11.0",
